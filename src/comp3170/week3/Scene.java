@@ -16,6 +16,7 @@ import org.joml.Vector4f;
 import comp3170.GLBuffers;
 import comp3170.Shader;
 import comp3170.ShaderLibrary;
+import static comp3170.Math.TAU;
 
 public class Scene {
 
@@ -30,6 +31,8 @@ public class Scene {
 	private int colourBuffer;
 
 	private Shader shader;
+	
+	private Matrix4f modelMatrix = new Matrix4f();
 
 	public Scene() {
 
@@ -77,7 +80,17 @@ public class Scene {
 			// @formatter:on
 
 		indexBuffer = GLBuffers.createIndexBuffer(indices);
-
+		
+		float offsetX = 0.0f;
+		float offsetY = 0.0f;
+		//translationMatrix(offsetX, offsetY, modelMatrix);
+		
+		float scaleX = 0.1f;
+		float scaleY = 2.0f;
+		scaleMatrix(scaleX, scaleY, modelMatrix);
+		
+		float rotation = TAU/3;
+//		rotationMatrix(rotation, modelMatrix);
 	}
 
 	public void draw() {
@@ -85,6 +98,8 @@ public class Scene {
 		shader.enable();
 		// set the attributes
 		shader.setAttribute("a_position", vertexBuffer);
+		shader.setUniform("u_modelMatrix", modelMatrix);
+		
 		shader.setAttribute("a_colour", colourBuffer);
 
 		// draw using index buffer
@@ -134,7 +149,16 @@ public class Scene {
 
 	public static Matrix4f rotationMatrix(float angle, Matrix4f dest) {
 
-		// TODO: Your code here
+		//			[ cos(a) -sin(a) 0 0 ]
+		//	R(a) =  [ sin(a)  cos(a) 0 0 ]
+		//			[	0		0	 0 0 ]
+		//			[	0		0	 0 1 ]
+		
+		dest.m00((float) Math.cos(angle));
+		dest.m01((float) Math.sin(angle));
+		dest.m10((float) Math.sin(-angle));
+		dest.m11((float) Math.cos(angle));
+
 
 		return dest;
 	}
@@ -151,7 +175,13 @@ public class Scene {
 
 	public static Matrix4f scaleMatrix(float sx, float sy, Matrix4f dest) {
 
-		// TODO: Your code here
+		//			[	sx  0  0  0 ]
+		//S(sx,sy)= [	0   sy 0  0 ]
+		//			[	0	0  0  0 ]
+		//			[	0	0  0  1 ]
+		
+		dest.m00((float) Math.cos(sx));
+		dest.m11((float) Math.sin(sy));
 
 		return dest;
 	}
