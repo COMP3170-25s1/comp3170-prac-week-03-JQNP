@@ -38,13 +38,13 @@ public class Scene {
 	private Matrix4f scalMatrix = new Matrix4f();
 	
 	
-	final private float offsetX = 0.0f;
-	private float offsetY = 0.0f;
+	private float offsetX = -0.25f;
+	private float offsetY = 0.5f;
 	
 	private float scaleX = 0.1f;
 	private float scaleY = 0.1f;
 	
-	private float rotation = TAU/12;
+	private float rotation = TAU/3;
 	
 	final private float movementSpeed = 1.0f;
 
@@ -107,7 +107,17 @@ public class Scene {
 	public void update(float deltaTime) {
 		float movement = movementSpeed * deltaTime;
 		float rotationRate = rotation * deltaTime;
-		modelMatrix.translateLocal(0.0f, movement, 0.0f).rotateZ(rotationRate);
+//		modelMatrix.translate(0.0f, movement, 0.0f).rotateZ(rotationRate);
+		
+		offsetX += movement;
+		offsetY += movement;		
+		
+		System.out.println(offsetX + ", " + offsetY + ", " + scaleX + ", " + scaleY +", " + rotation );
+		translationMatrix(offsetX, offsetY, transMatrix);
+		scaleMatrix(scaleX, scaleY, scalMatrix);
+		rotationMatrix(rotation, rotMatrix);
+
+		modelMatrix.identity().mul(transMatrix).mul(rotMatrix).mul(scalMatrix); // T R S (like in Unity)
 	}
 
 	public void draw() {
