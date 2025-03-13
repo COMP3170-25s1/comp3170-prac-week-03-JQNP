@@ -33,6 +33,21 @@ public class Scene {
 	private Shader shader;
 	
 	private Matrix4f modelMatrix = new Matrix4f();
+	private Matrix4f transMatrix = new Matrix4f();
+	private Matrix4f rotMatrix = new Matrix4f();
+	private Matrix4f scalMatrix = new Matrix4f();
+	
+	
+	final private float offsetX = 0.0f;
+	private float offsetY = 0.0f;
+	
+	private float scaleX = 0.1f;
+	private float scaleY = 0.1f;
+	
+	private float rotation = TAU/12;
+	
+	final private float movementSpeed = 1.0f;
+
 
 	public Scene() {
 
@@ -79,22 +94,23 @@ public class Scene {
 			};
 			// @formatter:on
 
-		indexBuffer = GLBuffers.createIndexBuffer(indices);
+		indexBuffer = GLBuffers.createIndexBuffer(indices); 
 		
-		float offsetX = 0.0f;
-		float offsetY = 0.0f;
-		//translationMatrix(offsetX, offsetY, modelMatrix);
+		translationMatrix(offsetX, offsetY, transMatrix);
+		scaleMatrix(scaleX, scaleY, scalMatrix);
+		rotationMatrix(rotation, rotMatrix);
 		
-		float scaleX = 0.1f;
-		float scaleY = 2.0f;
-		scaleMatrix(scaleX, scaleY, modelMatrix);
-		
-		float rotation = TAU/3;
-//		rotationMatrix(rotation, modelMatrix);
+		modelMatrix.mul(transMatrix).mul(rotMatrix).mul(scalMatrix); // T R S (like in Unity)
+	}
+	
+	
+	public void update(float deltaTime) {
+		float movement = movementSpeed * deltaTime;
+		float rotationRate = rotation * deltaTime;
+		modelMatrix.translateLocal(0.0f, movement, 0.0f).rotateZ(rotationRate);
 	}
 
 	public void draw() {
-		
 		shader.enable();
 		// set the attributes
 		shader.setAttribute("a_position", vertexBuffer);
@@ -180,8 +196,8 @@ public class Scene {
 		//			[	0	0  0  0 ]
 		//			[	0	0  0  1 ]
 		
-		dest.m00((float) Math.cos(sx));
-		dest.m11((float) Math.sin(sy));
+		dest.m00(sx);
+		dest.m11(sy);
 
 		return dest;
 	}
